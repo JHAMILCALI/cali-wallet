@@ -34,7 +34,8 @@
         }
       ],
       "expo-secure-store",
-      "react-native-quick-crypto"
+      "react-native-quick-crypto",
+      ["./plugins/with-android-queries", ["com.openai.chatgpt"]]
     ],
     "experiments": {
       "typedRoutes": true,

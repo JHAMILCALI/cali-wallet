@@ -1,30 +1,48 @@
-import * as Device from 'expo-device';
-import { Platform, StyleSheet } from 'react-native';
+import * as Clipboard from 'expo-clipboard';
+import * as IntentLauncher from 'expo-intent-launcher';
+import * as Linking from 'expo-linking';
+import { Alert, Platform, Pressable, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { AnimatedIcon } from '@/components/animated-icon';
-import { HintRow } from '@/components/hint-row';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { WebBadge } from '@/components/web-badge';
 import { BottomTabInset, MaxContentWidth, Spacing } from '@/constants/theme';
 
-function getDevMenuHint() {
-  if (Platform.OS === 'web') {
-    return <ThemedText type="small">use browser devtools</ThemedText>;
+// Web URLs: if the app is installed, Android/iOS app links open it; otherwise the browser opens.
+const MCP_NAME = 'GoldEye';
+const MCP_URL = 'https://goldeye-trace-mcp.pinata-server.workers.dev/mcp';
+
+// Claude: this link opens "Add custom connector" with name and URL prefilled (user still confirms).
+// ChatGPT has no prefill link, so we copy the URL and open the app; androidPackage must be in the app.json <queries> plugin.
+const AI_APPS = [
+  {
+    name: 'Claude',
+    url: `https://claude.ai/customize/connectors?modal=add-custom-connector&connectorName=${encodeURIComponent(MCP_NAME)}&connectorUrl=${encodeURIComponent(MCP_URL)}`,
+  },
+  { name: 'ChatGPT', url: 'https://chatgpt.com', androidPackage: 'com.openai.chatgpt' },
+];
+
+async function launch({ name, url, androidPackage }: (typeof AI_APPS)[number]) {
+  try {
+    if (Platform.OS === 'android' && androidPackage) {
+      IntentLauncher.openApplication(androidPackage);
+    } else {
+      await Linking.openURL(url);
+    }
+  } catch {
+    Alert.alert('No disponible', `${name} no está instalada o no se pudo abrir`);
   }
-  if (Device.isDevice) {
-    return (
-      <ThemedText type="small">
-        shake device or press <ThemedText type="code">m</ThemedText> in terminal
-      </ThemedText>
-    );
-  }
-  const shortcut = Platform.OS === 'android' ? 'cmd+m (or ctrl+m)' : 'cmd+d';
-  return (
-    <ThemedText type="small">
-      press <ThemedText type="code">{shortcut}</ThemedText>
-    </ThemedText>
+}
+
+async function openApp(app: (typeof AI_APPS)[number]) {
+  if (!app.androidPackage) return launch(app);
+  await Clipboard.setStringAsync(MCP_URL);
+  Alert.alert(
+    `Conectar ${MCP_NAME} en ${app.name}`,
+    `URL del MCP copiada. En ${app.name}: Plugins → Añadir → Add custom MCP server, pon el nombre "${MCP_NAME}" y pega la URL.`,
+    [{ text: 'Abrir', onPress: () => launch(app) }]
   );
 }
 
@@ -35,24 +53,22 @@ export default function HomeScreen() {
         <ThemedView style={styles.heroSection}>
           <AnimatedIcon />
           <ThemedText type="title" style={styles.title}>
-            Welcome to&nbsp;Expo
+            Cali Wallet
           </ThemedText>
         </ThemedView>
 
-        <ThemedText type="code" style={styles.code}>
-          get started
-        </ThemedText>
-
         <ThemedView type="backgroundElement" style={styles.stepContainer}>
-          <HintRow
-            title="Try editing"
-            hint={<ThemedText type="code">src/app/index.tsx</ThemedText>}
-          />
-          <HintRow title="Dev tools" hint={getDevMenuHint()} />
-          <HintRow
-            title="Fresh start"
-            hint={<ThemedText type="code">npm run reset-project</ThemedText>}
-          />
+          {AI_APPS.map((app) => (
+            <Pressable
+              key={app.name}
+              accessibilityRole="button"
+              onPress={() => openApp(app)}
+              style={({ pressed }) => [styles.button, pressed && styles.pressed]}>
+              <ThemedView type="backgroundSelected" style={styles.buttonInner}>
+                <ThemedText type="smallBold">Abrir {app.name}</ThemedText>
+              </ThemedView>
+            </Pressable>
+          ))}
         </ThemedView>
 
         {Platform.OS === 'web' && <WebBadge />}
@@ -85,14 +101,22 @@ const styles = StyleSheet.create({
   title: {
     textAlign: 'center',
   },
-  code: {
-    textTransform: 'uppercase',
-  },
   stepContainer: {
     gap: Spacing.three,
     alignSelf: 'stretch',
     paddingHorizontal: Spacing.three,
     paddingVertical: Spacing.four,
     borderRadius: Spacing.four,
+  },
+  button: {
+    borderRadius: Spacing.three,
+    overflow: 'hidden',
+  },
+  buttonInner: {
+    alignItems: 'center',
+    paddingVertical: Spacing.three,
+  },
+  pressed: {
+    opacity: 0.7,
   },
 });
