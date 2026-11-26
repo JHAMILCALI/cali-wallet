@@ -1,16 +1,18 @@
-# Learn more https://docs.github.com/en/get-started/getting-started-with-git/ignoring-files
+# Dependencies and package manager artifacts in every project
+**/node_modules/
+**/.npm/
 
-# dependencies
-node_modules/
+# Expo, Metro and generated web output
+**/.expo/
+**/dist/
+**/web-build/
+**/.metro-health-check*
+**/expo-env.d.ts
 
-# Expo
-.expo/
-dist/
-web-build/
-expo-env.d.ts
-
-# Native
-.kotlin/
+# Generated native projects (CNG)
+cali-mobile/android/
+cali-mobile/ios/
+**/.kotlin/
 *.orig.*
 *.jks
 *.p8
@@ -18,26 +20,25 @@ expo-env.d.ts
 *.key
 *.mobileprovision
 
-# Metro
-.metro-health-check*
+# Backend and tool output
+**/build/
+**/coverage/
+**/.cache/
+**/*.tsbuildinfo
 
-# debug
+# Local environment and credentials
+**/.env
+**/.env.*
+!**/.env.example
+!**/.env.sample
+*.pem
+
+# Logs and operating system files
 npm-debug.*
 yarn-debug.*
 yarn-error.*
-
-# macOS
+*.log
 .DS_Store
-*.pem
 
-# local env files
-.env*.local
-
-# typescript
-*.tsbuildinfo
-
-example
-
-# generated native folders
-/ios
-/android
+# Expo template reset output
+example/

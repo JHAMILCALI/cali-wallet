@@ -1,16 +1,16 @@
-This is an Expo/React Native mobile application. Prioritize mobile-first patterns, performance, and cross-platform compatibility.
+This is the Cali repository. The existing Expo/React Native application lives in `cali-mobile/`; run its package and Expo commands from that directory. `cali-backend/` and `cali-mcp/` are reserved for future independent projects. Keep the repository's Git metadata, this file, `LICENSE`, and `.claude/` at the root. For mobile work, prioritize mobile-first patterns, performance, and cross-platform compatibility.
 
 ## Expo has changed — do not trust your training data
 
 Expo ships breaking changes every SDK release. APIs you remember are likely renamed, moved, or removed. Before writing any code that touches an Expo, EAS, or React Native API:
 
-1. Read the major version of the `expo` package in `package.json`.
+1. Read the major version of the `expo` package in `cali-mobile/package.json`.
 2. Fetch the matching versioned docs: `https://docs.expo.dev/versions/v<major>.0.0/`
 3. For anything else, fetch https://docs.expo.dev/llms.txt — an index of all Expo docs with corrections to common LLM misconceptions. Follow its links to the specific page you need; never answer from memory.
 
 ## Commands
 
-Use `bunx` instead of `npx` if the project uses bun (`bun.lock` present).
+Run the commands below from `cali-mobile/`. Use `bunx` instead of `npx` if that project uses bun (`bun.lock` present).
 
 ```bash
 npx expo install <package>  # ALWAYS use instead of npm/yarn/pnpm/bun add — resolves SDK-compatible versions
@@ -25,7 +25,7 @@ Run lint and typecheck before declaring any task done.
 
 ## Navigation & Routing
 
-- Use **Expo Router** for all navigation. Routes live in `src/app/` — every file there is a screen, `_layout.tsx` files define navigators. Keep non-route code (components, hooks, utils) outside `src/app/`.
+- Use **Expo Router** for all navigation. Routes live in `cali-mobile/src/app/` (or `src/app/` from the mobile directory) — every file there is a screen, `_layout.tsx` files define navigators. Keep non-route code (components, hooks, utils) outside the route directory.
 - Import `Link`, `router`, and `useLocalSearchParams` from `expo-router`.
 - Docs: https://docs.expo.dev/router/introduction.md
 
